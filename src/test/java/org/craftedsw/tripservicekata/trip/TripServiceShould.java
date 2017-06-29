@@ -13,17 +13,21 @@ import java.util.List;
 
 public class TripServiceShould {
 
+    public static final User GUEST = null;
+    public static final User LOGGED_USER = new User();
+    public static final User FRIEND = new User();
+
     @Test(expected = UserNotLoggedInException.class)
     public void throw_an_exception_if_user_is_not_logged() throws Exception {
-        TripService tripService = new TripServiceTested(null, null);
+        TripService tripService = new TripServiceTested(GUEST, null);
 
         tripService.getTripsByUser(new User());
     }
 
     @Test
     public void user_without_friends_can_not_retrive_trips() throws Exception {
-        TripService tripService = new TripServiceTested(new User(), null);
-        List<Trip> trips = tripService.getTripsByUser(new User());
+        TripService tripService = new TripServiceTested(LOGGED_USER, null);
+        List<Trip> trips = tripService.getTripsByUser(FRIEND);
 
         assertThat(trips.size(),is(0));
     }
@@ -31,12 +35,10 @@ public class TripServiceShould {
     @Test
     public void user_can_get_friend_trips() throws Exception {
 
-        User me = new User();
-        TripService tripService = new TripServiceTested(me, Arrays.asList(new Trip()));
-        User friend = new User();
+        TripService tripService = new TripServiceTested(LOGGED_USER, Arrays.asList(new Trip()));
+        FRIEND.setFriends(Arrays.asList(LOGGED_USER));
 
-        friend.setFriends(Arrays.asList(me));
-        List<Trip> trips = tripService.getTripsByUser(friend);
+        List<Trip> trips = tripService.getTripsByUser(FRIEND);
 
         assertThat(trips.size(),is(1));
     }
