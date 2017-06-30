@@ -3,6 +3,7 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
+import org.craftedsw.tripservicekata.user.UserSession;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,10 +20,13 @@ public class TripServiceShould {
     public static final User LOGGED_USER = new User();
     public static final User FRIEND = new User();
     private TripDAO tripDAO;
+    private UserSession userSession;
+
 
     @Before
     public void setUp() throws Exception {
         tripDAO = Mockito.mock(TripDAO.class);
+        userSession = Mockito.mock(UserSession.class);
     }
 
     @Test(expected = UserNotLoggedInException.class)
@@ -52,18 +56,15 @@ public class TripServiceShould {
     }
 
     private class TripServiceTested extends TripService {
-        private User user;
 
         public TripServiceTested(User user, List<Trip> trips) {
-            super(tripDAO);
+            super(tripDAO, userSession);
+            Mockito.when(userSession.getLoggedUser()).thenReturn(user);
             Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(trips);
-            this.user = user;
+
         }
 
-        @Override
-        protected User getLoggedUser() {
-            return user;
-        }
+
 
 
     }

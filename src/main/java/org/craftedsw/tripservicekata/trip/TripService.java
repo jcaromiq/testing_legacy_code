@@ -10,9 +10,11 @@ import org.craftedsw.tripservicekata.user.UserSession;
 public class TripService {
 
 	private TripDAO tripDao;
+	private UserSession userSession;
 
-	public TripService(TripDAO tripDao) {
+	public TripService(TripDAO tripDao, UserSession userSession) {
 		this.tripDao = tripDao;
+		this.userSession = userSession;
 	}
 
 	public List<Trip> getTripsByUser(User user) throws UserNotLoggedInException {
@@ -38,7 +40,7 @@ public class TripService {
 	}
 
 	protected User getLoggedUser() {
-		return UserSession.getInstance().getLoggedUser();
+		return userSession.getLoggedUser();
 	}
 
 }
