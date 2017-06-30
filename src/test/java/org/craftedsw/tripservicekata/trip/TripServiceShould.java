@@ -31,14 +31,18 @@ public class TripServiceShould {
 
     @Test(expected = UserNotLoggedInException.class)
     public void throw_an_exception_if_user_is_not_logged() throws Exception {
-        TripService tripService = new TripServiceTested(GUEST, null);
+        Mockito.when(userSession.getLoggedUser()).thenReturn(GUEST);
+        TripService tripService = new TripService(tripDAO,userSession);
 
         tripService.getTripsByUser(new User());
     }
 
     @Test
     public void user_without_friends_can_not_retrive_trips() throws Exception {
-        TripService tripService = new TripServiceTested(LOGGED_USER, null);
+        TripService tripService = new TripService(tripDAO,userSession);
+        Mockito.when(userSession.getLoggedUser()).thenReturn(LOGGED_USER);
+        Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(Arrays.asList());
+
         List<Trip> trips = tripService.getTripsByUser(FRIEND);
 
         assertThat(trips.size(),is(0));
@@ -46,26 +50,14 @@ public class TripServiceShould {
 
     @Test
     public void user_can_get_friend_trips() throws Exception {
-
-        TripService tripService = new TripServiceTested(LOGGED_USER, Arrays.asList(new Trip()));
+        TripService tripService = new TripService(tripDAO,userSession);
         FRIEND.setFriends(Arrays.asList(LOGGED_USER));
+        Mockito.when(userSession.getLoggedUser()).thenReturn(LOGGED_USER);
+        Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(Arrays.asList(new Trip()));
 
         List<Trip> trips = tripService.getTripsByUser(FRIEND);
 
         assertThat(trips.size(),is(1));
     }
 
-    private class TripServiceTested extends TripService {
-
-        public TripServiceTested(User user, List<Trip> trips) {
-            super(tripDAO, userSession);
-            Mockito.when(userSession.getLoggedUser()).thenReturn(user);
-            Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(trips);
-
-        }
-
-
-
-
-    }
 }
