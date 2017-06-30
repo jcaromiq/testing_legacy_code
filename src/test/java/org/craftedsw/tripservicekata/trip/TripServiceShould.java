@@ -20,7 +20,7 @@ public class TripServiceShould {
     private static final User GUEST = null;
     private static final User LOGGED = new User();
 
-    private static final User USER_FRIEND_OF_LOOGED = new User();
+    private static final User USER_FRIEND_OF_LOGGED = new User();
     private static final User A_USER = new User();
     private static final User USER_WITHOUT_FRIENDS = new User();
 
@@ -32,7 +32,7 @@ public class TripServiceShould {
     private TripService tripService;
 
     static {
-        USER_FRIEND_OF_LOOGED.setFriends(Arrays.asList(LOGGED));
+        USER_FRIEND_OF_LOGGED.setFriends(Arrays.asList(LOGGED));
     }
 
     @Before
@@ -63,7 +63,7 @@ public class TripServiceShould {
     public void user_can_get_friend_trips() throws Exception {
         given_a_user_logged_and_friend_with_trips();
 
-        List<Trip> trips = when_retrieve_trips_of(USER_FRIEND_OF_LOOGED);
+        List<Trip> trips = when_retrieve_trips_of(USER_FRIEND_OF_LOGGED);
 
         verify_then(trips, 1);
     }
@@ -74,7 +74,7 @@ public class TripServiceShould {
 
     private void given_a_user_logged_and_friend_with_trips() {
         Mockito.when(userSession.getLoggedUser()).thenReturn(LOGGED);
-        Mockito.when(tripDAO.findTrips(USER_FRIEND_OF_LOOGED)).thenReturn(Arrays.asList(TRIP));
+        Mockito.when(tripDAO.findTrips(USER_FRIEND_OF_LOGGED)).thenReturn(Arrays.asList(TRIP));
     }
 
     private void given_a_user(User user) {
