@@ -3,7 +3,9 @@ package org.craftedsw.tripservicekata.trip;
 
 import org.craftedsw.tripservicekata.exception.UserNotLoggedInException;
 import org.craftedsw.tripservicekata.user.User;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -16,6 +18,12 @@ public class TripServiceShould {
     public static final User GUEST = null;
     public static final User LOGGED_USER = new User();
     public static final User FRIEND = new User();
+    private TripDAO tripDAO;
+
+    @Before
+    public void setUp() throws Exception {
+        tripDAO = Mockito.mock(TripDAO.class);
+    }
 
     @Test(expected = UserNotLoggedInException.class)
     public void throw_an_exception_if_user_is_not_logged() throws Exception {
@@ -45,11 +53,11 @@ public class TripServiceShould {
 
     private class TripServiceTested extends TripService {
         private User user;
-        private List<Trip> trips;
 
         public TripServiceTested(User user, List<Trip> trips) {
+            super(tripDAO);
+            Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(trips);
             this.user = user;
-            this.trips = trips;
         }
 
         @Override
@@ -57,9 +65,6 @@ public class TripServiceShould {
             return user;
         }
 
-        @Override
-        protected List<Trip> getTripsBy(User user) {
-            return trips;
-        }
+
     }
 }
