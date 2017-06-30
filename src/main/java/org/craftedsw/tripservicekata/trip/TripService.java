@@ -14,14 +14,8 @@ public class TripService {
 		User loggedUser = getLoggedUser();
 		validate(loggedUser);
 
-		boolean isFriend = false;
-		for (User friend : user.getFriends()) {
-			if (friend.equals(loggedUser)) {
-				isFriend = true;
-				break;
-			}
-		}
-		if (isFriend) {
+
+		if (user.areFriends(loggedUser)) {
 			tripList = getTripsBy(user);
 		}
 		return tripList;

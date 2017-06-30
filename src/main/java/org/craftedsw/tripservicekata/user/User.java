@@ -14,4 +14,15 @@ public class User {
 	public void setFriends(List<User> friends) {
 		this.friends = friends;
 	}
+
+	public boolean areFriends(User loggedUser) {
+		boolean isFriend = false;
+		for (User friend : getFriends()) {
+			if (friend.equals(loggedUser)) {
+				isFriend = true;
+				break;
+			}
+		}
+		return isFriend;
+	}
 }
