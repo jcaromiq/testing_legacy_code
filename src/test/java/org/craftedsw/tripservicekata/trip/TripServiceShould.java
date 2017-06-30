@@ -16,16 +16,24 @@ import java.util.List;
 
 public class TripServiceShould {
 
-    public static final User GUEST = null;
-    public static final User LOGGED_USER = new User();
-    public static final User FRIEND = new User();
-    public static final User A_USER = new User();
-    public static final List<Trip> NO_TRIPS = Arrays.asList();
-    public static final Trip TRIP = new Trip();
+
+    private static final User GUEST = null;
+    private static final User LOGGED = new User();
+
+    private static final User USER_FRIEND_OF_LOOGED = new User();
+    private static final User A_USER = new User();
+    private static final User USER_WITHOUT_FRIENDS = new User();
+
+    private static final Trip TRIP = new Trip();
+
+
     private TripDAO tripDAO;
     private UserSession userSession;
     private TripService tripService;
 
+    static {
+        USER_FRIEND_OF_LOOGED.setFriends(Arrays.asList(LOGGED));
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -38,33 +46,43 @@ public class TripServiceShould {
     public void throw_an_exception_if_user_is_not_logged() throws Exception {
         given_a_user(GUEST);
 
-        getTripsOf(A_USER);
+        when_retrieve_trips_of(A_USER);
     }
 
 
     @Test
-    public void user_without_friends_can_not_retrive_trips() throws Exception {
-        given_a_user(LOGGED_USER);
-        Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(NO_TRIPS);
+    public void user_without_friends_can_not_retrieve_trips() throws Exception {
+        given_a_user(LOGGED);
 
-        assertThat(getTripsOf(FRIEND).size(),is(0));
+        List<Trip> trips = when_retrieve_trips_of(USER_WITHOUT_FRIENDS);
+
+        verify_then(trips, 0);
     }
 
     @Test
     public void user_can_get_friend_trips() throws Exception {
-        FRIEND.setFriends(Arrays.asList(LOGGED_USER));
-        given_a_user(LOGGED_USER);
-        Mockito.when(tripDAO.findTrips(FRIEND)).thenReturn(Arrays.asList(TRIP));
+        given_a_user_logged_and_friend_with_trips();
 
-        assertThat(getTripsOf(FRIEND).size(),is(1));
+        List<Trip> trips = when_retrieve_trips_of(USER_FRIEND_OF_LOOGED);
+
+        verify_then(trips, 1);
     }
 
-    private void given_a_user(User guest) {
-        Mockito.when(userSession.getLoggedUser()).thenReturn(guest);
+    private void verify_then(List<Trip> trips, int value) {
+        assertThat(trips.size(),is(value));
     }
 
-    private List<Trip> getTripsOf(User aUser) throws UserNotLoggedInException {
-        return tripService.getTripsByUser(aUser);
+    private void given_a_user_logged_and_friend_with_trips() {
+        Mockito.when(userSession.getLoggedUser()).thenReturn(LOGGED);
+        Mockito.when(tripDAO.findTrips(USER_FRIEND_OF_LOOGED)).thenReturn(Arrays.asList(TRIP));
+    }
+
+    private void given_a_user(User user) {
+        Mockito.when(userSession.getLoggedUser()).thenReturn(user);
+    }
+
+    private List<Trip> when_retrieve_trips_of(User user) throws UserNotLoggedInException {
+        return tripService.getTripsByUser(user);
     }
 
 }
